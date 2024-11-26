@@ -1,0 +1,9 @@
+{
+    "election": "voting_difficulty",
+    "ballot": 10,
+    "description": "From 0 (very hard) to 10 (very easy) how's voting using this API?",
+    "participants": "GLOBAL",
+    "min_value": 0,
+    "max_value": 10,
+    "allow_intermediary": true
+}
