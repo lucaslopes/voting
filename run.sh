@@ -10,6 +10,7 @@ else
 fi
 
 uv pip install -U syftbox
+uv pip install -r requirements.txt
 
 . .venv/bin/activate
 
@@ -19,3 +20,4 @@ python3 main.py
 
 # # deactivate the virtual environment
 deactivate
+
