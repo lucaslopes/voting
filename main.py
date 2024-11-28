@@ -1,6 +1,7 @@
 import os
 import glob
 import json
+import shutil
 from pathlib import Path
 from phe import paillier
 from syftbox.lib import Client
@@ -72,6 +73,8 @@ def main():
     write_syftperm(elections_dir / "_.syftperm", dict(syftperm))
     write_syftperm(ballots_dir / "_.syftperm", dict(syftperm, read=[client.email, "GLOBAL"]))
 
+    webapp_path = Path(__file__).parent / "voting.html"
+    shutil.copy(webapp_path, client.datasite_path / "public/voting.html")
 
     # Get list of participants
     participants = network_participants(datasite_path)
@@ -143,25 +146,41 @@ def main():
                 total_score = decrypt(sum_encrypted_votes, n, lambda_param, mu)
                 num_votes = len(election_ballots)
                 average_score = total_score / num_votes
+                election["votesCounted"] = num_votes
 
                 print(f"Election {election_id}: total score {total_score}, average score {average_score}, voters: {num_votes}")
 
                 # Store outcome
                 outcome = {
-                    'total_score': total_score,
-                    'average_score': average_score,
-                    'num_votes': num_votes
+                    'total': total_score,
+                    'average': average_score,
                 }
 
             except Exception as e:
                 print(f"Error processing election {election_id}: {e}")
                 outcome = None
         
-
         # Write to our own public directory
         public_election = prepare_public_election_data(election, outcome)
         public_election_file = public_dir / f"election-{election_id}.json"
         write_json(public_election_file, public_election)
+
+    # Put all election outcomes into a single file
+    outcomes = {}
+    for participant in participants:
+        participant_path = datasite_path / participant
+        outcomes_dir = participant_path / "api_data/voting/public"
+
+        for outcome_file in outcomes_dir.glob('election-*.json'):
+            try:
+                outcome = load_json(outcome_file)
+                election_id = outcome['publicKeyMetadata']
+                outcomes[election_id] = outcome
+            except Exception as e:
+                print(f"Error loading outcome file {outcome_file}: {e}")
+
+    outcome_file = client.datasite_path / "public" / "election_outcomes.json"
+    write_json(outcome_file, outcomes)
 
     return True
 
