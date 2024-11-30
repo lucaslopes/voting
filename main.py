@@ -4,17 +4,13 @@ import json
 import shutil
 from pathlib import Path
 from phe import paillier
-from syftbox.lib import Client
+from syftbox.lib import Client, SyftPermission
 
 def write_json(file_path: Path, result: dict) -> None:
     print(f"Writing to {file_path}.")
     file_path.parent.mkdir(parents=True, exist_ok=True)
     with open(file_path, "w") as f:
         json.dump(result, f)
-
-def write_syftperm(path, syftperm):
-    syftperm["filepath"] = str(path)
-    write_json(path, syftperm)
 
 def load_json(file_path):
     with open(file_path, "r") as f:
@@ -62,16 +58,9 @@ def main():
     ballots_dir.mkdir(parents=True, exist_ok=True)
 
     # Set permissions
-    syftperm = {
-        "admin": [client.email],
-        "read": [client.email],
-        "write": [client.email],
-        "filepath": None,
-        "terminal": False
-    }
-    write_syftperm(public_dir / "_.syftperm", dict(syftperm, read=[client.email, "GLOBAL"]))
-    write_syftperm(elections_dir / "_.syftperm", dict(syftperm))
-    write_syftperm(ballots_dir / "_.syftperm", dict(syftperm, read=[client.email, "GLOBAL"]))
+    SyftPermission.mine_with_public_read(client.email).ensure(public_dir / "_.syftperm")
+    SyftPermission.datasite_default(client.email).ensure(elections_dir / "_.syftperm")
+    SyftPermission.mine_with_public_read(client.email).ensure(ballots_dir / "_.syftperm")
 
     webapp_path = Path(__file__).parent / "voting.html"
     shutil.copy(webapp_path, client.datasite_path / "public/voting.html")
