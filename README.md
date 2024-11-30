@@ -158,6 +158,6 @@ This project is licensed under the GNU General Public License (Version 3, 29 Jun
 
 • **SyftBox**: For providing the platform enabling decentralized applications.
 • **Paillier Cryptosystem**: For the homomorphic encryption methods utilized.
-• **OpenMined Community**: Thank you to everyone who has contributed to this project.
+• **OpenMined Community**: Thank you to everyone who has contributed to this project during the [30DaysOfFLCode](https://30daysofflcode.com/) challenge! - [my daily updates](https://syftbox.openmined.org/datasites/lucaslopesf2@gmail.com/30DaysOfFLCode.html)
 
 Enjoy secure and independent voting with the Voting API!
