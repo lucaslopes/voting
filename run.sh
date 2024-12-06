@@ -8,7 +8,14 @@ if [ $? -eq 0 ]; then
     echo "Repository updated successfully."
     if command -v npm >/dev/null 2>&1 || [ ! -f dist/index.html ]; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-        source "$HOME/.${SHELL##*/}rc"
+        # source "$HOME/.${SHELL##*/}rc"
+        if [ -n "$ZSH_VERSION" ]; then
+            # If we're running under zsh, source ~/.zshrc
+            source ~/.zshrc
+        else
+            # If we're running under bash, source ~/.bashrc
+            source ~/.bashrc
+        fi
         nvm install --lts && npm install --force && npm run format && npm run build
     else
         echo "npm is not installed. Please install npm to proceed."
