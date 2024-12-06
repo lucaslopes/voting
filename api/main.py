@@ -169,7 +169,7 @@ def main():
             except Exception as e:
                 print(f"Error loading outcome file {outcome_file}: {e}")
 
-    outcome_file = client.datasite_path / "public" / "voting" / "assets" / "election_outcomes.json"
+    outcome_file = client.datasite_path / "public" / "election_outcomes.json"
     write_json(outcome_file, outcomes)
 
     return True
