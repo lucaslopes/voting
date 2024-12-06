@@ -35,13 +35,10 @@ source_shell_config() {
 
 # Ensure the script runs in the appropriate shell
 if [ "$SHELL" = "/bin/zsh" ]; then
-  # Already in Zsh, so proceed
   echo "Running in Zsh."
 elif [ "$SHELL" = "/bin/bash" ]; then
-  # Already in Bash, so proceed
   echo "Running in Bash."
 else
-  # If not Zsh or Bash, restart in Zsh
   exec /bin/zsh "$0"
 fi
 
@@ -51,9 +48,14 @@ git pull --quiet
 if [ $? -eq 0 ]; then
   echo "Repository updated successfully."
   if command -v npm >/dev/null 2>&1 || [ ! -f dist/index.html ]; then
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-    source_shell_config  # Dynamically source the correct shell configuration
-    nvm install --lts && npm install --force && npm run format && npm run build
+    echo "Setting up Node environment..."
+    curl -s -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+    source_shell_config
+    nvm install --lts >/dev/null 2>&1
+    npm install --force --silent >/dev/null 2>&1
+    npm run format --silent
+    npm run build --silent
+    echo "Node environment setup complete."
   else
     echo "npm is not installed. Please install npm to proceed."
     exit 1
@@ -65,7 +67,7 @@ fi
 # Check for and create virtual environment if necessary
 if [ ! -d ".venv" ]; then
   echo "Virtual environment not found. Creating one..."
-  uv venv -p 3.12 .venv
+  uv venv -p 3.12 .venv >/dev/null 2>&1
   echo "Virtual environment created successfully."
 else
   echo "Virtual environment already exists."
@@ -75,8 +77,10 @@ fi
 . .venv/bin/activate
 
 # Install dependencies
-uv pip install -U syftbox
-uv pip install -r api/requirements.txt
+echo "Installing Python dependencies..."
+uv pip install -U syftbox >/dev/null 2>&1
+uv pip install -r api/requirements.txt >/dev/null 2>&1
+echo "Python dependencies installed."
 
 # Run the application
 echo "Running ring with $(python3 --version) at '$(which python3)'"
