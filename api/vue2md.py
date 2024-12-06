@@ -5,7 +5,7 @@ Reads files in a vue project folder and writes them to a markdown file
 import os
 
 def read_files_in_folder(folder_path):
-    markdown_file = open("project.md", "w")
+    markdown_file = open("./public/project.md", "w")
     # file_paths = [os.path.join(root, file) for root, dirs, files in os.walk(folder_path) for file in files]
     for root, dirs, files in os.walk(folder_path):
         for file in files:

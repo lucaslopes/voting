@@ -51,16 +51,19 @@ def main():
     public_dir = api_dir / "public"
     elections_dir = api_dir / "elections"
     ballots_dir = api_dir / "ballots"
+    budgets_dir = api_dir / "budgets"
 
     # Create directories if they don't exist
     public_dir.mkdir(parents=True, exist_ok=True)
     elections_dir.mkdir(parents=True, exist_ok=True)
     ballots_dir.mkdir(parents=True, exist_ok=True)
+    budgets_dir.mkdir(parents=True, exist_ok=True)
 
     # Set permissions
     SyftPermission.mine_with_public_read(client.email).ensure(public_dir / "_.syftperm")
     SyftPermission.datasite_default(client.email).ensure(elections_dir / "_.syftperm")
     SyftPermission.mine_with_public_read(client.email).ensure(ballots_dir / "_.syftperm")
+    SyftPermission.mine_with_public_read(client.email).ensure(budgets_dir / "_.syftperm")
 
     webapp_path = Path(__file__).parent.parent / "dist/index.html"
     dumped_webapp_path = client.datasite_path / "public/voting.html"
