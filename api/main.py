@@ -62,9 +62,9 @@ def main():
     SyftPermission.datasite_default(client.email).ensure(elections_dir / "_.syftperm")
     SyftPermission.mine_with_public_read(client.email).ensure(ballots_dir / "_.syftperm")
 
-    webapp_path = Path(__file__).parent / "dist/index.html"
+    webapp_path = Path(__file__).parent.parent / "dist/index.html"
     dumped_webapp_path = client.datasite_path / "public/voting.html"
-    shutil.copytree(webapp_path, dumped_webapp_path, dirs_exist_ok=True)
+    shutil.copy(webapp_path, dumped_webapp_path)
 
     # Get list of participants
     participants = network_participants(datasite_path)
