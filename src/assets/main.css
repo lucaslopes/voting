@@ -1,0 +1,23 @@
+/* You can keep your existing styles or adjust them as needed */
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.router-link-active {
+  font-weight: bold;
+}
+
+.content {
+  padding: 1rem;
+}
+
+button {
+  cursor: pointer;
+}
