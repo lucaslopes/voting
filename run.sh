@@ -7,7 +7,8 @@ git pull --quiet
 if [ $? -eq 0 ]; then
     echo "Repository updated successfully."
     if command -v npm >/dev/null 2>&1 || [ ! -f dist/index.html ]; then
-        npm install --force && npm run format && npm run build
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+        nvm install --lts && npm install --force && npm run format && npm run build
     else
         echo "npm is not installed. Please install npm to proceed."
         exit 1
