@@ -158,6 +158,12 @@ def main():
         public_election_file = public_dir / f"election-{election_id}.json"
         write_json(public_election_file, public_election)
 
+    # Delete public elections that are no longer in `api_data/voting/elections`
+    for public_election_file in public_dir.glob('election-*.json'):
+        election_id = public_election_file.name.split('-')[1].split('.')[0]
+        if election_id not in elections:
+            public_election_file.unlink()
+
     # Put all election outcomes into a single file
     outcomes = {}
     for participant in participants:
