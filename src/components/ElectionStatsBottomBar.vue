@@ -10,14 +10,8 @@
 import { computed } from "vue";
 import { store } from "../store";
 
-// Assuming store or props can give us the data. If not, we can pass it as props.
-// In RatedEVoting.vue, you have `elections` ref that we can pass in.
-// We'll pass it from RatedEVoting via store or props. Let's do store trick:
-// We'll store these counts in store or use a global variable.
-// For a quick solution, let's have store or a global variable set onMounted.
-
-const totalElections = computed(() => store.totalElections || 0);
-const totalVotes = computed(() => store.totalVotes || 0);
+const totalElections = computed(() => store.totalElections.value || 0);
+const totalVotes = computed(() => store.totalVotes.value || 0);
 </script>
 
 <style scoped>

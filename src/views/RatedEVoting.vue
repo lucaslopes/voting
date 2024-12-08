@@ -360,6 +360,12 @@ export default defineComponent({
           election.currentScore = election.defaultValue;
           elections.value.push(election);
         }
+        const totalElections = elections.value.length;
+        const totalVotes = elections.value.reduce(
+          (sum, e) => sum + e.votesCounted, 0,
+        );
+        store.totalElections.value = totalElections;
+        store.totalVotes.value = totalVotes;
       } catch (error) {
         console.error("Error loading elections:", error);
       }
@@ -446,14 +452,6 @@ export default defineComponent({
 
     onMounted(() => {
       renderElections();
-
-      const totalElections = elections.value.length;
-      const totalVotes = elections.value.reduce(
-        (sum, e) => sum + e.votesCounted,
-        0,
-      );
-      store.totalElections = totalElections;
-      store.totalVotes = totalVotes;
 
       if (store.topNavbarContent) {
         store.topNavbarContent.value = RatedEVotingHeader;

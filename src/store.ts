@@ -48,8 +48,8 @@ export const store = {
   goUpLevel: null as (() => void) | null,
   rootNode,
   currentNode,
-  totalElections: 0,
-  totalVotes: 0,
+  totalElections: ref(0),
+  totalVotes: ref(0),
   exportJSON() {
     if (!this.rootNode) {
       console.error("No root node found for export");
