@@ -101,64 +101,38 @@
       <div class="modal-body">
         <ol>
           <li>
-            <h3>Install SyftBox</h3>
-            <p>
-              Paste the following command into your terminal (MacOS/Linux only):
-            </p>
+            <h3>Install <a href="https://syftbox-documentation.openmined.org/#installing-a-syftbox-api" target="_blank">SyftBox</a></h3>
+            <p>Ensure <code>curl</code> is installed (refer to 
+              <a href="https://everything.curl.dev/install/linux.html" target="_blank">Linux</a>, 
+              <a href="https://everything.curl.dev/install/macos.html" target="_blank">MacOS</a>, or 
+              <a href="https://everything.curl.dev/install/windows/index.html" target="_blank">Windows</a> guides if needed), 
+              then run this command in your terminal:</p>
             <div class="command-container">
               <div class="command">
-                <code
-                  >curl -LsSf https://syftbox.openmined.org/install.sh |
-                  sh</code
-                >
+                <code>curl -LsSf https://syftbox.openmined.org/install.sh | sh</code>
                 <button @click="copyToClipboard(installCommand)">Copy</button>
               </div>
             </div>
           </li>
           <li>
             <h3>Set Up Voting API</h3>
-            <p>
-              Open the SyftBox folder on your Desktop. Move the voting API into
-              the
-              <code>apis/</code> folder:
-            </p>
-            <ul>
-              <li>
-                <strong>If you have git, run:</strong>
-                <div class="command-container">
-                  <div class="command">
-                    <code
-                      >git clone https://github.com/lucaslopes/voting.git</code
-                    >
-                    <button @click="copyToClipboard(gitCommand)">Copy</button>
-                  </div>
-                </div>
-              </li>
-              <li>
-                Alternatively, download the ZIP file:
-                <a
-                  href="https://github.com/lucaslopes/voting/archive/refs/heads/main.zip"
-                  class="download-button"
-                  >Download Repository</a
-                >
-              </li>
-            </ul>
+            <p>Install the Voting API directly in your SyftBox by running:</p>
+            <div class="command-container">
+              <div class="command">
+                <code>syftbox app install lucaslopes/voting</code>
+                <button @click="copyToClipboard('syftbox app install lucaslopes/voting')">Copy</button>
+              </div>
+            </div>
           </li>
           <li>
             <h3>Cast Votes or Submit Elections</h3>
+            <p>
+              Move the downloaded <code>JSON</code> files in its corresponding folders under 
+              <strong><code>SyftBox/datasites/&lt;your@email.org&gt;/api_data/voting/</code></strong>:
+            </p>
             <ul>
-              <li>
-                Move your ballot JSON file to:
-                <code
-                  >SyftBox/datasites/&lt;your@email.org&gt;/api_data/voting/ballots</code
-                >
-              </li>
-              <li>
-                Move new election JSON file to:
-                <code
-                  >SyftBox/datasites/&lt;your@email.org&gt;/api_data/voting/elections</code
-                >
-              </li>
+              <li><strong><code>ballots/</code></strong>: For your encrypted ballot downloaded as a <code>JSON</code> file once voted.</li>
+              <li><strong><code>elections/</code></strong>: For your election downloaded as a <code>JSON</code> file once created.</li>
             </ul>
           </li>
         </ol>
