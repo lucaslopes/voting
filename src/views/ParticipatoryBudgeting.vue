@@ -162,7 +162,7 @@
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        alert('Copied to clipboard!')
+        console.log('Copied to clipboard: ' + text)
       })
       .catch((err) => {
         alert('Failed to copy: ' + err)
