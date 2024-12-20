@@ -42,6 +42,7 @@ export const store = {
   topNavbarContent: shallowRef<Component | null>(VotingComponent),
   bottomNavbarContent: shallowRef<any>(null),
   rightSidebarContent: shallowRef<any>(null),
+  openAboutModal: undefined as (() => void) | undefined,
   openHowToUseModal: undefined as (() => void) | undefined,
   openNewElectionModal: undefined as (() => void) | undefined,
   navigateTo: null as ((node: TreeNode) => void) | null,
