@@ -29,13 +29,15 @@
         }}</span>
       </button>
       <div class="election-info">
-        <span>Public Key: {{ election.publicKeyMetadata }}</span>
-        <span>Creation Date: {{ formatDate(election.creationDate) }}</span>
-        <span>Last Updated: {{ formatDate(election.lastUpdateTime) }}</span>
         <span
-          :class="{ 'low-votes': election.votesCounted < 3 }"
-          title="At least 3 votes are required to aggregate the outcome of the election"
-          >Votes Counted: {{ election.votesCounted }}</span
+          class="participants-info"
+          :title="`Creation Date: ${formatDate(election.creationDate)}\nLast Updated: ${formatDate(election.lastUpdateTime)}`"
+          >Date</span
+        >
+        <span :title="`Election Public Key Metadata`">{{ election.publicKeyMetadata }}</span>
+        <!-- <span class="participants-info" :title="getVotersInfo(election)">Participants</span> -->
+        <span :class="{ 'low-votes': election.votesCounted < 3 }" :title="getVotersInfo(election)"
+          >Votes: {{ election.votesCounted }}</span
         >
       </div>
     </div>
@@ -204,6 +206,8 @@
     outcome: any
     defaultValue?: number
     currentScore?: number
+    creator: string
+    voters?: string[]
   }
 
   interface ElectionMap {
@@ -242,6 +246,15 @@
           .catch((err) => {
             alert('Failed to copy: ' + err)
           })
+      }
+
+      const getVotersInfo = (election: Election): string => {
+        const creator = election.creator.split('@')[0]
+        let voters = election.voters ? election.voters.map((v) => v.split('@')[0]).join('\n- ') : ''
+        if (election.votesCounted < 3) {
+          voters = `At least 3 votes are required to aggregate the outcome of the election`
+        }
+        return `Created by:\n${creator}\n\nVoters:\n- ${voters ? voters : 'Not available'}`
       }
 
       const getSliderStyle = (value: number, colorPair: { left: string; right: string }) => {
@@ -335,7 +348,8 @@
           votesCounted: 0,
           creationDate,
           lastUpdateTime: creationDate,
-          outcome: null
+          outcome: null,
+          creator: ''
         }
 
         // Download election file
@@ -526,7 +540,8 @@
         gitCommand,
         copyToClipboard,
         slider_colors,
-        getSliderStyle
+        getSliderStyle,
+        getVotersInfo
       }
     }
   })
@@ -872,5 +887,11 @@
 
   .low-votes {
     color: red;
+  }
+
+  .participants-info {
+    cursor: help;
+    text-decoration: underline dotted;
+    margin-right: 10px;
   }
 </style>

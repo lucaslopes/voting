@@ -153,6 +153,7 @@ def main():
                     outcome = {
                         'total': total_score,
                         'average': average_score,
+                        'voters': list(election_ballots.keys())  # Add list of voters
                     }
 
             except Exception as e:
