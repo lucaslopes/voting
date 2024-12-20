@@ -13,14 +13,20 @@
         max="100"
         step="1"
         v-model.number="election.currentScore"
+        :style="getSliderStyle(election.currentScore ?? 0, slider_colors)"
       />
       <div class="slider-labels">
-        <span style="float: left">{{ election.lowerValue }}</span>
-        <span style="float: right">{{ election.upperValue }}</span>
+        <span style="float: left">{{ election.leftistValue }}</span>
+        <span style="float: right">{{ election.rightistValue }}</span>
       </div>
-      <button class="vote-button" @click="encryptAndDownload(election.publicKeyMetadata)">
-        Vote: <span>{{ election.currentScore }}</span
-        >%
+      <button
+        class="vote-button"
+        title="Vote"
+        @click="encryptAndDownload(election.publicKeyMetadata)"
+      >
+        <span>{{
+          `${Math.round(100 - (election.currentScore ?? 0))} / ${Math.round(election.currentScore ?? 0)}`
+        }}</span>
       </button>
       <div class="election-info">
         <span>Public Key: {{ election.publicKeyMetadata }}</span>
@@ -130,33 +136,33 @@
         <textarea
           id="question"
           v-model="question"
-          placeholder="How easy is it to vote using this app?"
+          placeholder="e.g. I trust the Voting API"
           required
         ></textarea>
         <span class="error">{{ errors.question }}</span>
 
         <div class="form-row">
           <div class="form-field">
-            <label for="lower-value">Lower Value Description:</label>
+            <label for="leftist-value">Left Description:</label>
             <input
               type="text"
-              id="lower-value"
-              v-model="lowerValue"
-              placeholder="Very Hard"
+              id="leftist-value"
+              v-model="leftistValue"
+              placeholder="e.g. Strongly Disagree"
               required
             />
-            <span class="error">{{ errors.lowerValue }}</span>
+            <span class="error">{{ errors.leftistValue }}</span>
           </div>
           <div class="form-field">
-            <label for="upper-value">Upper Value Description:</label>
+            <label for="rightist-value">Right Description:</label>
             <input
               type="text"
-              id="upper-value"
-              v-model="upperValue"
-              placeholder="Very Easy"
+              id="rightist-value"
+              v-model="rightistValue"
+              placeholder="e.g. Strongly Agree"
               required
             />
-            <span class="error">{{ errors.upperValue }}</span>
+            <span class="error">{{ errors.rightistValue }}</span>
           </div>
         </div>
 
@@ -175,8 +181,8 @@
 
   interface Election {
     question: string
-    lowerValue: string
-    upperValue: string
+    leftistValue: string
+    rightistValue: string
     publicKey: {
       n: string
       g: string
@@ -208,13 +214,17 @@
       const showAboutModal = ref(false)
       const elections = ref<Election[]>([])
       const question = ref('')
-      const lowerValue = ref('')
-      const upperValue = ref('')
+      const leftistValue = ref('')
+      const rightistValue = ref('')
       const errors = reactive({
         question: '',
-        lowerValue: '',
-        upperValue: ''
+        leftistValue: '',
+        rightistValue: ''
       })
+      const slider_colors = {
+        left: '#B72200', //'#' + Math.floor(Math.random() * 16777215).toString(16),
+        right: '#2B58D0' // '#' + Math.floor(Math.random() * 16777215).toString(16)
+      }
 
       const installCommand = ref('curl -LsSf https://syftbox.openmined.org/install.sh | sh')
       const gitCommand = ref('git clone https://github.com/lucaslopes/voting.git')
@@ -223,11 +233,28 @@
         navigator.clipboard
           .writeText(text)
           .then(() => {
-            alert('Copied to clipboard!')
+            console.log('Copied to clipboard: ' + text)
           })
           .catch((err) => {
             alert('Failed to copy: ' + err)
           })
+      }
+
+      const getSliderStyle = (value: number, colorPair: { left: string; right: string }) => {
+        const midPoint = 50 // Middle point of the slider
+        let gradient
+
+        if (value > midPoint) {
+          // Coloring from the midpoint to the right
+          gradient = `linear-gradient(to right, #ccc ${midPoint}%, ${colorPair.right} ${midPoint}%, ${colorPair.right} ${value}%, #ccc ${value}%)`
+        } else {
+          // Coloring from the midpoint to the left
+          gradient = `linear-gradient(to right, #ccc ${value}%, ${colorPair.left} ${value}%, ${colorPair.left} ${midPoint}%, #ccc ${midPoint}%)`
+        }
+
+        return {
+          background: gradient
+        }
       }
 
       function openAboutModal() {
@@ -263,18 +290,18 @@
           errors.question = ''
         }
 
-        if (!lowerValue.value.trim()) {
-          errors.lowerValue = 'Lower slider value description is required.'
+        if (!leftistValue.value.trim()) {
+          errors.leftistValue = 'Left slider value description is required.'
           valid = false
         } else {
-          errors.lowerValue = ''
+          errors.leftistValue = ''
         }
 
-        if (!upperValue.value.trim()) {
-          errors.upperValue = 'Upper slider value description is required.'
+        if (!rightistValue.value.trim()) {
+          errors.rightistValue = 'Right slider value description is required.'
           valid = false
         } else {
-          errors.upperValue = ''
+          errors.rightistValue = ''
         }
 
         if (!valid) return
@@ -288,8 +315,8 @@
 
         const election: Election = {
           question: question.value.trim(),
-          lowerValue: lowerValue.value.trim(),
-          upperValue: upperValue.value.trim(),
+          leftistValue: leftistValue.value.trim(),
+          rightistValue: rightistValue.value.trim(),
           publicKey: {
             n: publicKey.n.toString(),
             g: publicKey.g.toString()
@@ -320,8 +347,8 @@
 
         // Reset form
         question.value = ''
-        lowerValue.value = ''
-        upperValue.value = ''
+        leftistValue.value = ''
+        rightistValue.value = ''
         closeNewElectionModal()
         alert('Election created successfully!')
       }
@@ -334,21 +361,26 @@
           elections.value = []
           for (const electionId in electionsData) {
             const election = electionsData[electionId]
-            if (
-              !(
-                'question' in election &&
-                'lowerValue' in election &&
-                'upperValue' in election &&
-                'publicKey' in election &&
-                'publicKeyMetadata' in election &&
-                'votesCounted' in election &&
-                'creationDate' in election &&
-                'lastUpdateTime' in election &&
-                'outcome' in election
-              )
-            ) {
-              console.warn('Invalid election data:', election)
+            const requiredKeys = [
+              'question',
+              'publicKey',
+              'publicKeyMetadata',
+              'votesCounted',
+              'creationDate',
+              'lastUpdateTime',
+              'outcome'
+            ]
+            const hasOldKeys = 'lowerValue' in election && 'upperValue' in election
+            const hasNewKeys = 'leftistValue' in election && 'rightistValue' in election
+
+            if (!hasOldKeys && !hasNewKeys) {
+              console.warn('Invalid election data, missing required keys', election)
               continue
+            }
+
+            if (hasOldKeys) {
+              election.leftistValue = election.lowerValue
+              election.rightistValue = election.upperValue
             }
             election.defaultValue = election.outcome === null ? 50 : election.outcome.average
             election.currentScore = election.defaultValue
@@ -381,6 +413,7 @@
             BigInt(election.publicKey.g)
           )
           const vote = parseFloat(election.currentScore!.toString())
+          console.log(election.currentScore, election.currentScore!.toString())
           const encryptedVote = publicKey.encrypt(BigInt(Math.round(vote)))
 
           const encryptedData = {
@@ -482,12 +515,14 @@
         encryptAndDownload,
         formatDate,
         question,
-        lowerValue,
-        upperValue,
+        leftistValue,
+        rightistValue,
         errors,
         installCommand,
         gitCommand,
-        copyToClipboard
+        copyToClipboard,
+        slider_colors,
+        getSliderStyle
       }
     }
   })
@@ -659,10 +694,32 @@
   input,
   textarea,
   .slider {
+    appearance: none;
     width: 100%;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+    height: 8px;
+    border-radius: 5px;
+    background: #ccc;
+    outline: none;
+    transition: background 0.3s;
+  }
+
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #000;
+    cursor: pointer;
+  }
+
+  .slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #000;
+    cursor: pointer;
   }
 
   .vote-button {
