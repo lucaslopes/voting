@@ -124,30 +124,36 @@ def main():
             outcome = None
         else:
             try:
-                n = int(election['publicKey']['n'])
-                lambda_param = int(election['privateKey']['lambda'])
-                mu = int(election['privateKey']['mu'])
-                nsquare = n * n
-
-                # Aggregate encrypted votes
-                sum_encrypted_votes = 1
-                for ballot in election_ballots.values():
-                    c = int(ballot['ciphertext'])
-                    sum_encrypted_votes = (sum_encrypted_votes * c) % nsquare
-
-                # Decrypt the sum
-                total_score = decrypt(sum_encrypted_votes, n, lambda_param, mu)
+                # Ensure at least 3 participants before calculating the outcome
                 num_votes = len(election_ballots)
-                average_score = total_score / num_votes
                 election["votesCounted"] = num_votes
 
-                print(f"Election {election_id}: total score {total_score}, average score {average_score}, voters: {num_votes}")
+                if num_votes < 3:
+                    print(f"Election {election_id} does not have enough participants. Votes counted: {num_votes}")
+                    outcome = None
+                else:
+                    n = int(election['publicKey']['n'])
+                    lambda_param = int(election['privateKey']['lambda'])
+                    mu = int(election['privateKey']['mu'])
+                    nsquare = n * n
 
-                # Store outcome
-                outcome = {
-                    'total': total_score,
-                    'average': average_score,
-                }
+                    # Aggregate encrypted votes
+                    sum_encrypted_votes = 1
+                    for ballot in election_ballots.values():
+                        c = int(ballot['ciphertext'])
+                        sum_encrypted_votes = (sum_encrypted_votes * c) % nsquare
+
+                    # Decrypt the sum
+                    total_score = decrypt(sum_encrypted_votes, n, lambda_param, mu)
+                    average_score = total_score / num_votes
+
+                    print(f"Election {election_id}: total score {total_score}, average score {average_score}, voters: {num_votes}")
+
+                    # Store outcome
+                    outcome = {
+                        'total': total_score,
+                        'average': average_score,
+                    }
 
             except Exception as e:
                 print(f"Error processing election {election_id}: {e}")

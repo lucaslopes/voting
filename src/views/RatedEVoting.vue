@@ -32,7 +32,11 @@
         <span>Public Key: {{ election.publicKeyMetadata }}</span>
         <span>Creation Date: {{ formatDate(election.creationDate) }}</span>
         <span>Last Updated: {{ formatDate(election.lastUpdateTime) }}</span>
-        <span>Votes Counted: {{ election.votesCounted }}</span>
+        <span
+          :class="{ 'low-votes': election.votesCounted < 3 }"
+          title="At least 3 votes are required to aggregate the outcome of the election"
+          >Votes Counted: {{ election.votesCounted }}</span
+        >
       </div>
     </div>
   </div>
@@ -864,5 +868,9 @@
 
   .command button:hover {
     background: #0056b3;
+  }
+
+  .low-votes {
+    color: red;
   }
 </style>
